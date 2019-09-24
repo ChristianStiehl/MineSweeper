@@ -7,6 +7,7 @@ class Block extends PIXI.Container {
     }
 
     this.tapped = false;
+    this.hasFlag = false;
     this.adjacentBombs = adjacentTiles.bombs;
     this.adjacentTiles = adjacentTiles.tiles;
 
@@ -24,18 +25,51 @@ class Block extends PIXI.Container {
     this.buttonMode = true;
     this.interactive = true;
 
-    this.on('pointertap', this.tap, this);
+    this.on('pointerdown', this.pointerdown, this);
+    this.on('pointerup', this.pointerup, this);
   }
 
   disableControls() {
     this.buttonMode = false;
     this.interactive = false;
 
-    this.off('pointertap', this.tap);
+    this.off('pointerdown', this.pointerdown, this);
+    this.off('pointerup', this.pointerup, this);
+  }
+
+  pointerdown() {
+    this.holdTime = 0;
+
+    app.ticker.add(this.update, this);
+  }
+
+  update() {
+    this.holdTime += app.ticker.elapsedMS;
+
+    if (this.holdTime >= 1000) {
+      this.updateFlag();
+      app.ticker.remove(this.update, this);
+    }
+  }
+
+  pointerup() {
+    app.ticker.remove(this.update, this);
+
+    this.tap();
+  }
+
+  updateFlag() {
+    if (this.hasFlag) {
+      this.sprite.texture = blockTexture;
+      this.hasFlag = false;
+    } else {
+      this.sprite.texture = flagTexture;
+      this.hasFlag = true;
+    }
   }
 
   tap() {
-    if (this.tapped) {
+    if (this.tapped || this.hasFlag) {
       return;
     }
 
@@ -63,7 +97,7 @@ class Block extends PIXI.Container {
   }
 
   revealBomb() {
-    if (this.tapped) {
+    if (this.tapped || this.hasFlag) {
       return;
     }
 
