@@ -31,7 +31,6 @@ class Scene extends PIXI.Container {
     this.onRotate();
   }
 
-
   buildScene() {
     this.buildGrid();
   }
@@ -46,19 +45,7 @@ class Scene extends PIXI.Container {
     canvas.height = document.documentElement.clientHeight;
 
     if (this.grid) {
-      this.grid.x = canvas.width / 2;
-      this.grid.y = canvas.height / 2;
-
-      this.grid.scale.set(1);
-
-      const widthRatio = (canvas.width - 50) / this.grid.width;
-      const heightRatio = (canvas.height - 50) / this.grid.height;
-
-      if (widthRatio <= heightRatio) {
-        this.grid.scale.set(widthRatio);
-      } else {
-        this.grid.scale.set(heightRatio);
-      }
+      this.grid.onRotate();
     }
   }
 }

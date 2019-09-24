@@ -1,7 +1,7 @@
 # MineSweeper
 Mine Sweeper game, assignment for a job application.
 
-# How To Test
+# How To Play
 - install node
 - open cmd
 - run 'npm install http-server -g'

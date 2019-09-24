@@ -1,15 +1,12 @@
 class Block extends PIXI.Container {
-  constructor(adjacentTiles, isBomb) {
+  constructor(tileInfo, isBomb) {
     super();
-
-    if (isBomb === 1) {
-      this.isBomb = true;
-    }
 
     this.tapped = false;
     this.hasFlag = false;
-    this.adjacentBombs = adjacentTiles.bombs;
-    this.adjacentTiles = adjacentTiles.tiles;
+    this.adjacentBombs = tileInfo.bombs;
+    this.adjacentTiles = tileInfo.tiles;
+    this.isBomb = isBomb;
 
     this.buildSprite();
     this.enableControls();
@@ -19,6 +16,25 @@ class Block extends PIXI.Container {
     this.sprite = new PIXI.Sprite(blockTexture);
     this.sprite .anchor.set(0.5);
     this.addChild(this.sprite);
+  }
+
+  updateFlag() {
+    if (this.hasFlag) {
+      this.sprite.texture = blockTexture;
+      this.hasFlag = false;
+    } else {
+      this.sprite.texture = flagTexture;
+      this.hasFlag = true;
+    }
+  }
+
+  revealBomb() {
+    if (this.tapped || this.hasFlag) {
+      return;
+    }
+
+    this.sprite.texture = bombTexture;
+    this.disableControls();
   }
 
   enableControls() {
@@ -32,6 +48,7 @@ class Block extends PIXI.Container {
   disableControls() {
     this.buttonMode = false;
     this.interactive = false;
+    this.tapped = true;
 
     this.off('pointerdown', this.pointerdown, this);
     this.off('pointerup', this.pointerup, this);
@@ -58,16 +75,6 @@ class Block extends PIXI.Container {
     this.tap();
   }
 
-  updateFlag() {
-    if (this.hasFlag) {
-      this.sprite.texture = blockTexture;
-      this.hasFlag = false;
-    } else {
-      this.sprite.texture = flagTexture;
-      this.hasFlag = true;
-    }
-  }
-
   tap() {
     if (this.tapped || this.hasFlag) {
       return;
@@ -75,7 +82,6 @@ class Block extends PIXI.Container {
 
     if (this.isBomb) {
       this.sprite.texture = bombRedTexture;
-      this.tapped = true;
       this.disableControls();
 
       this.parent.showBombs();
@@ -83,26 +89,18 @@ class Block extends PIXI.Container {
     }
 
     this.sprite.texture = tileTextures[this.adjacentBombs];
-    this.tapped = true;
     this.disableControls();
 
     if (this.adjacentBombs === 0) {
       for (let i = 0; i < this.adjacentTiles.length; i += 1) {
-        const block = this.parent.grid[this.adjacentTiles[i].x][this.adjacentTiles[i].y];
+        const block = this.parent.grid[this.adjacentTiles[i].row][this.adjacentTiles[i].column];
         if (!block.isBomb) {
+          if(block.hasFlag) {
+            block.updateFlag();
+          }
           block.tap();
         }
       }
     }
-  }
-
-  revealBomb() {
-    if (this.tapped || this.hasFlag) {
-      return;
-    }
-
-    this.sprite.texture = bombTexture;
-    this.tapped = true;
-    this.disableControls();
   }
 }
