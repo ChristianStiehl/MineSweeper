@@ -14,7 +14,7 @@ class Grid extends PIXI.Container {
       [0, 0, 0, 1, 0, 0, 0, 0, 0],
       [0, 0, 0, 1, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 1, 0, 0, 0],
-      [1, 0, 0, 0, 0, 0, 1, 0, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0],
     ];
 
     this.gameEnded = false;
@@ -89,20 +89,16 @@ class Grid extends PIXI.Container {
   }
 
   onRotate() {
-    this.x = canvas.width / 2;
-    this.y = canvas.height / 2;
-
-    this.scale.set(1);
+    this.x = canvas.width * 0.5;
+    this.y = canvas.height * 0.55;
 
     const widthRatio = (canvas.width - (canvas.width * 0.1)) / (this.grid[0].length * 50);
-    const heightRatio = (canvas.height - (canvas.height * 0.1)) / (this.grid.length * 50);
+    const heightRatio = (canvas.height - (canvas.height * 0.2)) / (this.grid.length * 50);
 
-    if (widthRatio < 1 || heightRatio < 1) {
-      if (widthRatio <= heightRatio) {
-        this.scale.set(widthRatio);
-      } else {
-        this.scale.set(heightRatio);
-      }
+    if (widthRatio <= heightRatio) {
+      this.scale.set(widthRatio);
+    } else {
+      this.scale.set(heightRatio);
     }
   }
 }

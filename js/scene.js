@@ -34,6 +34,7 @@ class Scene extends PIXI.Container {
   buildScene() {
     this.buildBackground();
     this.buildGrid();
+    this.buildHud();
   }
 
   buildBackground() {
@@ -50,6 +51,11 @@ class Scene extends PIXI.Container {
     this.addChild(this.grid);
   }
 
+  buildHud() {
+    this.hud = new HUD();
+    this.addChild(this.hud);
+  }
+
   onRotate() {
     canvas.width = document.documentElement.clientWidth;
     canvas.height = document.documentElement.clientHeight;
@@ -63,6 +69,10 @@ class Scene extends PIXI.Container {
 
     if (this.grid) {
       this.grid.onRotate();
+    }
+
+    if (this.hud) {
+      this.hud.onRotate();
     }
   }
 }

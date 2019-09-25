@@ -18,30 +18,10 @@ class Block extends PIXI.Container {
     this.addChild(this.sprite);
   }
 
-  updateFlag() {
-    if (this.hasFlag) {
-      this.sprite.texture = blockTexture;
-      this.hasFlag = false;
-    } else {
-      this.sprite.texture = flagTexture;
-      this.hasFlag = true;
-    }
-  }
-
-  revealBomb() {
-    if (this.tapped || this.hasFlag) {
-      return;
-    }
-
-    this.sprite.texture = bombTexture;
-    this.disableControls();
-  }
-
   enableControls() {
     this.interactive = true;
 
     this.on('pointerdown', this.initialTap, this);
-    this.on('pointerup', this.release, this);
   }
 
   disableControls() {
@@ -56,13 +36,35 @@ class Block extends PIXI.Container {
     if (this.parent.gameEnded) {
       return;
     }
+
+    this.sprite.texture = tileTextures[0];
+
     this.holdTime = 0;
 
     if (event.data.originalEvent.button === 2) {
       this.updateFlag();
     } else {
-      app.ticker.add(this.update, this); 
+      this.on('pointerup', this.release, this);
+      this.on('pointerupoutside', this.cancel, this);
+      // app.ticker.add(this.update, this);
     }
+  }
+
+  release() {
+    if (this.parent.gameEnded) {
+      return;
+    }
+
+    // app.ticker.remove(this.update, this);
+
+    this.tap();
+  }
+
+  cancel() {
+    this.sprite.texture = blockTexture;
+
+    this.off('pointerup', this.release, this);
+    this.off('pointerupoutside', this.cancel, this);
   }
 
   update() {
@@ -74,15 +76,6 @@ class Block extends PIXI.Container {
     }
   }
 
-  release() {
-    if (this.parent.gameEnded) {
-      return;
-    }
-
-    app.ticker.remove(this.update, this);
-
-    this.tap();
-  }
 
   tap() {
     if (this.tapped || this.hasFlag || this.parent.gameEnded) {
@@ -113,5 +106,24 @@ class Block extends PIXI.Container {
     }
 
     this.parent.checkWin();
+  }
+
+  updateFlag() {
+    if (this.hasFlag) {
+      this.sprite.texture = blockTexture;
+      this.hasFlag = false;
+    } else {
+      this.sprite.texture = flagTexture;
+      this.hasFlag = true;
+    }
+  }
+
+  revealBomb() {
+    if (this.tapped || this.hasFlag) {
+      return;
+    }
+
+    this.sprite.texture = bombTexture;
+    this.disableControls();
   }
 }
