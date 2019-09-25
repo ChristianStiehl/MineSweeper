@@ -29,7 +29,6 @@ class Block extends PIXI.Container {
     this.tapped = true;
 
     this.off('pointerdown', this.initialTap, this);
-    this.off('pointerup', this.release, this);
   }
 
   initialTap(event) {
@@ -37,16 +36,18 @@ class Block extends PIXI.Container {
       return;
     }
 
-    this.sprite.texture = tileTextures[0];
+    const { button } = event.data.originalEvent;
 
-    this.holdTime = 0;
-
-    if (event.data.originalEvent.button === 2) {
+    if (button === 2) {
       this.updateFlag();
     } else {
       this.on('pointerup', this.release, this);
       this.on('pointerupoutside', this.cancel, this);
-      // app.ticker.add(this.update, this);
+
+      if (button === undefined) {
+        this.holdTime = 0;
+        app.ticker.add(this.update, this);
+      }
     }
   }
 
@@ -55,16 +56,17 @@ class Block extends PIXI.Container {
       return;
     }
 
-    // app.ticker.remove(this.update, this);
+    console.log('release');
 
-    this.tap();
+    this.flipTile();
+    this.cancel();
   }
 
   cancel() {
-    this.sprite.texture = blockTexture;
-
     this.off('pointerup', this.release, this);
     this.off('pointerupoutside', this.cancel, this);
+    app.ticker.remove(this.update, this);
+    this.holdTime = 0;
   }
 
   update() {
@@ -72,36 +74,33 @@ class Block extends PIXI.Container {
 
     if (this.holdTime >= 500) {
       this.updateFlag();
-      app.ticker.remove(this.update, this);
+      this.cancel();
     }
   }
 
 
-  tap() {
+  flipTile() {
     if (this.tapped || this.hasFlag || this.parent.gameEnded) {
       return;
     }
 
+    this.disableControls();
+
     if (this.isBomb) {
       this.sprite.texture = bombRedTexture;
-      this.disableControls();
-
       this.parent.showBombs();
       return;
     }
 
     this.sprite.texture = tileTextures[this.adjacentBombs];
-    this.disableControls();
 
     if (this.adjacentBombs === 0) {
       for (let i = 0; i < this.adjacentTiles.length; i += 1) {
         const block = this.parent.grid[this.adjacentTiles[i].row][this.adjacentTiles[i].column];
-        if (!block.isBomb) {
-          if(block.hasFlag) {
-            block.updateFlag();
-          }
-          block.tap();
+        if(block.hasFlag) {
+          block.updateFlag();
         }
+        block.flipTile();
       }
     }
 
