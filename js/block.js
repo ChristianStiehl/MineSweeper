@@ -38,38 +38,40 @@ class Block extends PIXI.Container {
   }
 
   enableControls() {
-    this.buttonMode = true;
     this.interactive = true;
 
-    this.on('pointerdown', this.pointerdown, this);
-    this.on('pointerup', this.pointerup, this);
+    this.on('pointerdown', this.initialTap, this);
+    this.on('pointerup', this.release, this);
   }
 
   disableControls() {
-    this.buttonMode = false;
     this.interactive = false;
     this.tapped = true;
 
-    this.off('pointerdown', this.pointerdown, this);
-    this.off('pointerup', this.pointerup, this);
+    this.off('pointerdown', this.initialTap, this);
+    this.off('pointerup', this.release, this);
   }
 
-  pointerdown() {
+  initialTap(event) {
     this.holdTime = 0;
 
-    app.ticker.add(this.update, this);
+    if (event.data.originalEvent.button === 2) {
+      this.updateFlag();
+    } else {
+      app.ticker.add(this.update, this); 
+    }
   }
 
   update() {
     this.holdTime += app.ticker.elapsedMS;
 
-    if (this.holdTime >= 1000) {
+    if (this.holdTime >= 500) {
       this.updateFlag();
       app.ticker.remove(this.update, this);
     }
   }
 
-  pointerup() {
+  release() {
     app.ticker.remove(this.update, this);
 
     this.tap();
@@ -102,5 +104,7 @@ class Block extends PIXI.Container {
         }
       }
     }
+
+    this.parent.checkWin();
   }
 }

@@ -22,17 +22,23 @@ class Grid extends PIXI.Container {
 
   buildGrid() {
     this.grid = [];
+    this.amountOfBombs = 0;
 
     for (let i = 0; i < this.presetGrid.length; i += 1) {
       const row = [];
       for (let j = 0; j < this.presetGrid[i].length; j += 1) {
         const isBomb = this.presetGrid[i][j] === 1;
         const tileInfo = this.getTileInfo(i, j);
+
         const block = new Block(tileInfo, isBomb);
         block.x = -(50 * ((this.presetGrid[i].length - 1) / 2)) + (j * 50);
         block.y = -(50 * ((this.presetGrid.length - 1) / 2)) + (i * 50);
         this.addChild(block);
         row.push(block);
+
+        if (isBomb) {
+          this.amountOfBombs += 1;
+        }
       }
       this.grid.push(row);
     }
@@ -73,14 +79,24 @@ class Grid extends PIXI.Container {
     console.log('you lose!');
   }
 
+  checkWin() {
+    for (let i = 0; i < this.grid.length; i += 1) {
+      for (let j = 0; j < this.grid[i].length; j += 1) {
+        if (!this.grid[i][j].tapped && !this.grid[i][j].isBomb) {
+          return false;
+        }
+      }
+    }
+
+    console.log('you win!');
+  }
+
   onRotate() {
     this.x = canvas.width / 2;
     this.y = canvas.height / 2;
 
-    this.scale.set(1);
-
-    const widthRatio = (canvas.width - 50) / this.width;
-    const heightRatio = (canvas.height - 50) / this.height;
+    const widthRatio = (canvas.width - 50) / (this.grid[0].length * 50);
+    const heightRatio = (canvas.height - 50) / (this.grid.length * 50);
 
     if (widthRatio <= heightRatio) {
       this.scale.set(widthRatio);
