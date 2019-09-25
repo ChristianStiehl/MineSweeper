@@ -36,10 +36,16 @@ class Block extends PIXI.Container {
       return;
     }
 
+    if (!this.hasFlag) {
+      this.sprite.texture = tileTextures[0];
+      scene.hud.updateSmiley(1);
+    }
+
     const { button } = event.data.originalEvent;
 
     if (button === 2) {
       this.updateFlag();
+      scene.hud.updateSmiley(0);
     } else {
       this.on('pointerup', this.release, this);
       this.on('pointerupoutside', this.cancel, this);
@@ -56,25 +62,29 @@ class Block extends PIXI.Container {
       return;
     }
 
-    console.log('release');
-
-    this.flipTile();
     this.cancel();
+    this.flipTile();
   }
 
   cancel() {
+    if (this.hasFlag) {
+      this.sprite.texture = flagTexture;
+    } else {
+      this.sprite.texture = blockTexture;
+    }
     this.off('pointerup', this.release, this);
     this.off('pointerupoutside', this.cancel, this);
     app.ticker.remove(this.update, this);
     this.holdTime = 0;
+    scene.hud.updateSmiley(0);
   }
 
   update() {
     this.holdTime += app.ticker.elapsedMS;
 
     if (this.holdTime >= 500) {
-      this.updateFlag();
       this.cancel();
+      this.updateFlag();
     }
   }
 

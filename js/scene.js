@@ -22,11 +22,16 @@ const tileTextures = [
   PIXI.Texture.from('img/tile8.png'),
 ];
 
+const smileyTextures = [
+  PIXI.Texture.from('img/smileyHappy.png'),
+  PIXI.Texture.from('img/smileySurprised.png'),
+  PIXI.Texture.from('img/smileyCool.png'),
+  PIXI.Texture.from('img/smileyDead.png'),
+];
+
 // scene will be the 'grandparent' class
 class Scene extends PIXI.Container {
-  constructor() {
-    super();
-
+  init() {
     this.buildScene();
     this.onRotate();
   }
@@ -80,6 +85,8 @@ class Scene extends PIXI.Container {
 // create a scene object
 const scene = new Scene();
 stage.addChild(scene);
+
+scene.init();
 
 // whenever the window resizes, lets make sure everything stays pretty.
 window.addEventListener('resize', () => {

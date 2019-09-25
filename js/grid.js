@@ -72,7 +72,7 @@ class Grid extends PIXI.Container {
     }
 
     this.gameEnded = true;
-    console.log('you lose!');
+    scene.hud.updateSmiley(3);
   }
 
   checkWin() {
@@ -85,7 +85,13 @@ class Grid extends PIXI.Container {
     }
 
     this.gameEnded = true;
-    console.log('you win!');
+    scene.hud.updateSmiley(2);
+  }
+
+  resetGame() {
+    this.removeChildren();
+    this.buildGrid();
+    this.gameEnded = false;
   }
 
   onRotate() {
