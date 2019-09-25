@@ -3,7 +3,6 @@ class HUD extends PIXI.Container {
     super();
 
     this.buildSmiley();
-    // this.buildTimer();
   }
 
   buildSmiley() {
@@ -21,7 +20,6 @@ class HUD extends PIXI.Container {
 
   resetGame() {
     this.smiley.texture = smileyTextures[0];
-
     scene.grid.resetGame();
   }
 

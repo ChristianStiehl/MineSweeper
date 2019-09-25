@@ -20,14 +20,12 @@ class Block extends PIXI.Container {
 
   enableControls() {
     this.interactive = true;
-
     this.on('pointerdown', this.initialTap, this);
   }
 
   disableControls() {
     this.interactive = false;
     this.tapped = true;
-
     this.off('pointerdown', this.initialTap, this);
   }
 
