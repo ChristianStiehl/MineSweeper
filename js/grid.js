@@ -17,12 +17,13 @@ class Grid extends PIXI.Container {
       [1, 0, 0, 0, 0, 0, 1, 0, 0],
     ];
 
+    this.gameEnded = false;
+
     this.buildGrid();
   }
 
   buildGrid() {
     this.grid = [];
-    this.amountOfBombs = 0;
 
     for (let i = 0; i < this.presetGrid.length; i += 1) {
       const row = [];
@@ -35,10 +36,6 @@ class Grid extends PIXI.Container {
         block.y = -(50 * ((this.presetGrid.length - 1) / 2)) + (i * 50);
         this.addChild(block);
         row.push(block);
-
-        if (isBomb) {
-          this.amountOfBombs += 1;
-        }
       }
       this.grid.push(row);
     }
@@ -70,12 +67,11 @@ class Grid extends PIXI.Container {
       for (let j = 0; j < this.grid[i].length; j += 1) {
         if (this.grid[i][j].isBomb) {
           this.grid[i][j].revealBomb();
-        } else {
-          this.grid[i][j].disableControls();
         }
       }
     }
 
+    this.gameEnded = true;
     console.log('you lose!');
   }
 
@@ -88,6 +84,7 @@ class Grid extends PIXI.Container {
       }
     }
 
+    this.gameEnded = true;
     console.log('you win!');
   }
 
@@ -95,13 +92,17 @@ class Grid extends PIXI.Container {
     this.x = canvas.width / 2;
     this.y = canvas.height / 2;
 
-    const widthRatio = (canvas.width - 50) / (this.grid[0].length * 50);
-    const heightRatio = (canvas.height - 50) / (this.grid.length * 50);
+    this.scale.set(1);
 
-    if (widthRatio <= heightRatio) {
-      this.scale.set(widthRatio);
-    } else {
-      this.scale.set(heightRatio);
+    const widthRatio = (canvas.width - (canvas.width * 0.1)) / (this.grid[0].length * 50);
+    const heightRatio = (canvas.height - (canvas.height * 0.1)) / (this.grid.length * 50);
+
+    if (widthRatio < 1 || heightRatio < 1) {
+      if (widthRatio <= heightRatio) {
+        this.scale.set(widthRatio);
+      } else {
+        this.scale.set(heightRatio);
+      }
     }
   }
 }

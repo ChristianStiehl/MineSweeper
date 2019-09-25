@@ -53,6 +53,9 @@ class Block extends PIXI.Container {
   }
 
   initialTap(event) {
+    if (this.parent.gameEnded) {
+      return;
+    }
     this.holdTime = 0;
 
     if (event.data.originalEvent.button === 2) {
@@ -72,13 +75,17 @@ class Block extends PIXI.Container {
   }
 
   release() {
+    if (this.parent.gameEnded) {
+      return;
+    }
+
     app.ticker.remove(this.update, this);
 
     this.tap();
   }
 
   tap() {
-    if (this.tapped || this.hasFlag) {
+    if (this.tapped || this.hasFlag || this.parent.gameEnded) {
       return;
     }
 
